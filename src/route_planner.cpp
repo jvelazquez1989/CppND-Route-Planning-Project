@@ -10,7 +10,24 @@ RoutePlanner::RoutePlanner(RouteModel &model, float start_x, float start_y, floa
 
     // TODO 2: Use the m_Model.FindClosestNode method to find the closest nodes to the starting and ending coordinates.
     // Store the nodes you find in the RoutePlanner's start_node and end_node attributes.
+	
+	// Find starting node
+    // Define StartingNode as a pointer and set it to the address of the starting node
+    RouteModel::Node* StartingNode = &m_Model.FindClosestNode(start_x, start_y);
+    std::cout << "Starting node address = " << StartingNode << "\n"; //print ending node address for debugging
+    std::cout << "Starting node x = " << (StartingNode->x) << "\n"; //print value of x
+    std::cout << "Starting node y = " << (StartingNode->y) << "\n"; //print value of y
 
+    // Find ending node
+    // Define EndingNode as a pointer and set it to the address of the starting node
+    RouteModel::Node* EndingNode = &m_Model.FindClosestNode(end_x, end_y);
+    std::cout << "Ending node address = " << EndingNode << "\n"; //print ending node address for debugging
+    std::cout << "Ending node x = " << (EndingNode->x) << "\n"; //print value of x
+    std::cout << "Ending node y = " << (EndingNode->y) << "\n"; //print value of y
+
+    //Store nodes
+    RoutePlanner::start_node = StartingNode;
+    RoutePlanner::end_node = EndingNode;
 }
 
 
@@ -20,7 +37,10 @@ RoutePlanner::RoutePlanner(RouteModel &model, float start_x, float start_y, floa
 // - Node objects have a distance method to determine the distance to another node.
 
 float RoutePlanner::CalculateHValue(RouteModel::Node const *node) {
-
+	// Input node is the current node
+    // node->distance() finds the distance from the current node to the end node
+    float distance_to_end = node->distance((*RoutePlanner::end_node));
+    return distance_to_end;
 }
 
 
