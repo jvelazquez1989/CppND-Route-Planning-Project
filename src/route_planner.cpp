@@ -83,6 +83,46 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
 // - Return the pointer.
 
 RouteModel::Node *RoutePlanner::NextNode() {
+	// - Sort the open_list according to the sum of the h value and g value.
+    //calculate the f value for each node in the open list
+    std::vector<float> f_value = {};
+    for(int i = 0; i < open_list.size(); i++)
+    {f_value[i] = open_list[i]->g_value + open_list[i]->h_value;}  
+
+    //build an index vector the size of f_value
+  	std::vector<int> index_vector = {}; //define blank index vector
+    for(int i = 0; i < f_value.size(); i++)
+    {index_vector.push_back(i);}
+  
+    //begin sorting the index vector based on the value of the corresponding f_value
+    for(int i = 0; i < index_vector.size(); i++)
+    {
+        for(int j = i + 1; j < index_vector.size(); j++)
+        {
+            if (f_value[index_vector[i]] < f_value[index_vector[j]])
+            {
+                //Swap indeces of the index vector if the current f_value is smaller than the next one in line
+                int temp_val = index_vector[i];
+                index_vector[i] = index_vector[j];
+                index_vector[j] = temp_val;
+
+                RouteModel::Node* temp_node = open_list[i];
+                open_list[i] = open_list[j];
+                open_list[j] = temp_node;
+            }
+        }
+    }
+
+    // - Create a pointer to the node in the list with the lowest sum.
+    //RouteModel::Node *LowestFNode = open_list[index_vector[0]];
+    RouteModel::Node *LowestFNode = open_list.back();
+
+    // - Remove that node from the open_list.
+    //open_list.erase(2);
+    open_list.pop_back();
+
+    // - Return the pointer.
+    return LowestFNode;  
 
 }
 
@@ -101,6 +141,33 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
     std::vector<RouteModel::Node> path_found;
 
     // TODO: Implement your solution here.
+	bool exit = false;  
+    int temp = 0;
+    while(exit == false)
+    {
+        
+        path_found.push_back(*current_node); //add the current node to the path found vector
+        
+        distance += current_node->distance(*current_node->parent); //add the distance between the current node to the parent node to the distance count
+        
+        current_node = current_node->parent; //set the next node to be added to equal the parent of the current node       
+
+        if(current_node == start_node)
+        {
+            path_found.push_back(*start_node);
+            exit = true;
+        }           
+    }
+
+    //re-arrange the path_found vector to place the start node first
+    reverse(path_found.begin(), path_found.end());
+
+    /*
+    std::cout << "start_node x = " << start_node->x << "\n";
+    std::cout << "path_found (start) x = " << path_found[0].x << "\n";
+    std::cout << "path_found (end) x = " << path_found[path_found.size()-1].x << "\n";
+    */  
+	
 
     distance *= m_Model.MetricScale(); // Multiply the distance by the scale of the map to get meters.
     return path_found;
