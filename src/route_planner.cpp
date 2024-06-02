@@ -83,33 +83,26 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
 // - Create a pointer to the node in the list with the lowest sum.
 // - Remove that node from the open_list.
 // - Return the pointer.
-/*
+
 RouteModel::Node *RoutePlanner::NextNode() {
 
 	// - Sort the open_list according to the sum of the h value and g value.
     //calculate the f value for each node in the open list
     std::vector<float> f_value = {};
     for(int i = 0; i < open_list.size(); i++)
-    {f_value[i] = open_list[i]->g_value + open_list[i]->h_value;}  
+    {f_value.push_back(open_list[i]->g_value + open_list[i]->h_value);}  
 
-    //build an index vector the size of f_value
-  	std::vector<int> index_vector = {}; //define blank index vector
-    for(int i = 0; i < f_value.size(); i++)
-    {index_vector.push_back(i);}
-  
     //begin sorting the index vector based on the value of the corresponding f_value
-    for(int i = 0; i < index_vector.size(); i++)
+    RouteModel::Node *temp_node = nullptr;
+    for(int i = 0; i < f_value.size(); i++)
     {
-        for(int j = i + 1; j < index_vector.size(); j++)
+        for(int j = i + 1; j < f_value.size(); j++)
         {
-            if (f_value[index_vector[i]] < f_value[index_vector[j]])
+            temp_node = nullptr;
+            if (f_value[i] < f_value[j])
             {
-                //Swap indeces of the index vector if the current f_value is smaller than the next one in line
-                int temp_val = index_vector[i];
-                index_vector[i] = index_vector[j];
-                index_vector[j] = temp_val;
-
-                RouteModel::Node* temp_node = open_list[i];
+                //Swap indeces of the open list vector if the current f_value is smaller than the next one in line
+                temp_node = open_list[i];
                 open_list[i] = open_list[j];
                 open_list[j] = temp_node;
             }
@@ -117,19 +110,16 @@ RouteModel::Node *RoutePlanner::NextNode() {
     }
 
     // - Create a pointer to the node in the list with the lowest sum.
-    //RouteModel::Node *LowestFNode = open_list[index_vector[0]];
     RouteModel::Node *LowestFNode = open_list.back();
 
     // - Remove that node from the open_list.
-    //open_list.erase(2);
     open_list.pop_back();
 
     // - Return the pointer.
-    return LowestFNode;  
-    //return open_list.back();
-}*/
+    return LowestFNode;    
+}
 
-
+/* Alternative solution to NextNode
 bool CompareFunction(const RouteModel::Node *a, const RouteModel::Node *b) {
 
 float f1 = a->g_value + a->h_value; //calculate f value for first node
@@ -153,8 +143,7 @@ RouteModel::Node *RoutePlanner::NextNode() {
 	// - Return the pointer.
     return lowest_node;
 }
-
-
+*/
 
 
 // TODO 6: Complete the ConstructFinalPath method to return the final path found from your A* search.
@@ -189,13 +178,7 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
     }
 
     //re-arrange the path_found vector to place the start node first
-    reverse(path_found.begin(), path_found.end());
-
-    /*
-    std::cout << "start_node x = " << start_node->x << "\n";
-    std::cout << "path_found (start) x = " << path_found[0].x << "\n";
-    std::cout << "path_found (end) x = " << path_found[path_found.size()-1].x << "\n";
-    */  
+    reverse(path_found.begin(), path_found.end());  
 
     distance *= m_Model.MetricScale(); // Multiply the distance by the scale of the map to get meters.
     return path_found;
